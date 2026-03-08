@@ -48,6 +48,8 @@ export type Database = {
       }
       ideas: {
         Row: {
+          ai_pitch: string | null
+          ai_tags: string[] | null
           amount_raised: number
           backer_count: number
           category: string
@@ -61,6 +63,8 @@ export type Database = {
           title: string
         }
         Insert: {
+          ai_pitch?: string | null
+          ai_tags?: string[] | null
           amount_raised?: number
           backer_count?: number
           category: string
@@ -74,6 +78,8 @@ export type Database = {
           title: string
         }
         Update: {
+          ai_pitch?: string | null
+          ai_tags?: string[] | null
           amount_raised?: number
           backer_count?: number
           category?: string

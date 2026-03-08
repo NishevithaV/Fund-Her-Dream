@@ -15,7 +15,7 @@ const IdeasGrid = ({ refreshKey }: IdeasGridProps) => {
   const fetchIdeas = async () => {
     const { data } = await supabase
       .from("ideas")
-      .select("id, founder_name, title, description, category, amount_raised, backer_count")
+      .select("id, founder_name, title, description, category, amount_raised, backer_count, ai_pitch, ai_tags")
       .eq("status", "approved")
       .order("created_at", { ascending: false });
 
