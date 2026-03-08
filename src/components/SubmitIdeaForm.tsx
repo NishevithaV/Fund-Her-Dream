@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, Sparkles } from "lucide-react";
 
 const categories = ["FinTech", "HealthTech", "EdTech", "Climate", "SaaS", "Social Impact"];
 
@@ -43,6 +43,23 @@ const SubmitIdeaForm = ({ open, onOpenChange, onSuccess }: SubmitIdeaFormProps) 
 
     setLoading(true);
     try {
+      // Generate AI pitch and tags
+      let aiPitch: string | null = null;
+      let aiTags: string[] | null = null;
+
+      try {
+        const { data: pitchData, error: pitchError } = await supabase.functions.invoke("generate-pitch", {
+          body: { title: form.title, description: form.description },
+        });
+
+        if (!pitchError && pitchData?.pitch) {
+          aiPitch = pitchData.pitch;
+          aiTags = pitchData.tags?.slice(0, 3) || null;
+        }
+      } catch {
+        console.warn("AI pitch generation failed, submitting without it");
+      }
+
       const { error } = await supabase.from("ideas").insert({
         founder_name: form.founder_name,
         email: form.email,
@@ -50,6 +67,8 @@ const SubmitIdeaForm = ({ open, onOpenChange, onSuccess }: SubmitIdeaFormProps) 
         description: form.description,
         category: form.category,
         link: form.link || null,
+        ai_pitch: aiPitch,
+        ai_tags: aiTags,
       });
 
       if (error) throw error;
@@ -126,8 +145,9 @@ const SubmitIdeaForm = ({ open, onOpenChange, onSuccess }: SubmitIdeaFormProps) 
               </div>
             </div>
 
-            <Button variant="hero" className="h-12 w-full" disabled={loading} onClick={handleSubmit}>
-              {loading ? "Submitting..." : "Submit Your Idea"}
+            <Button variant="hero" className="h-12 w-full gap-2" disabled={loading} onClick={handleSubmit}>
+              <Sparkles className="h-4 w-4" />
+              {loading ? "Generating pitch & submitting..." : "Submit Your Idea"}
             </Button>
           </>
         )}
