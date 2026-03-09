@@ -1,73 +1,71 @@
-# Welcome to your Lovable project
+# Fund Her Dream
 
-## Project info
+A micro-crowdfunding platform built for International Women's Day 2026, celebrating women founders and the bold ideas they are bringing to life.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+---
 
-## How can I edit this code?
+## The Story Behind It
 
-There are several ways of editing your application.
+This project was built as part of the **SheBuilds challenge** - a hackathon celebrating women in tech on International Women's Day 2026. The idea came from a simple observation: women-led startups are chronically underfunded, and even a small signal of financial belief can be the push a founder needs to keep going. Fund Her Dream is that signal. Anyone can submit an idea, and anyone can back it, starting at just $5.
 
-**Use Lovable**
+---
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+## What It Does
 
-Changes made via Lovable will be committed automatically to this repo.
+- **Submit an idea**: Women founders submit a title, description, category, and optional link through a modal form
+- **AI-generated pitch**: On submission, the idea is passed to an AI model (Gemini via Lovable's gateway) which generates a polished one-liner investor pitch and 3 category tags automatically
+- **Browse and back ideas**: Visitors browse a grid of approved ideas on the homepage (preview of 6) or the full dedicated ideas page at `/ideas`
+- **Stripe payments**: Backers choose a preset or custom amount and pay securely via Stripe Checkout
+- **Real-time updates**: Funding totals and backer counts update live across all connected sessions using Supabase Realtime
 
-**Use your preferred IDE**
+---
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## Tech Stack
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+| Layer | Technology |
+|---|---|
+| Frontend | React 18, TypeScript, Vite |
+| UI | shadcn/ui, Tailwind CSS |
+| Backend / DB | (Postgres + RLS + Realtime) |
+| Edge Functions | Deno (Supabase Edge Functions) |
+| Payments | Stripe Checkout |
+| AI | Google Gemini (via Lovable AI Gateway) |
 
-Follow these steps:
+---
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## AI Capability
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+When a founder submits an idea, a Supabase edge function calls the Lovable AI gateway using `google/gemini-3-flash-preview`. The model returns a structured response via tool calling -- a one-liner pitch capped at 120 characters and exactly 3 category tags. These are stored alongside the idea and surfaced on every card. The AI call is rate-limited to 10 requests per IP per hour to protect API credits.
 
-# Step 3: Install the necessary dependencies.
-npm i
+---
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+## Architecture and Vulnerability Handling
+
+- Three edge functions handle all server-side logic: `create-checkout`, `verify-payment`, and `generate-pitch`
+- Payment verification includes an idempotency check so a Stripe session can never be credited more than once
+- Row-Level Security is enforced on all tables - the public can read approved ideas but cannot directly insert contributions or update idea records (those actions are service-role only)
+- Rate limiting is applied at the edge function level across all three endpoints
+
+---
+
+## Running Locally
+
+```bash
+git clone https://github.com/NishevithaV/Fund-Her-Dream.git
+cd Fund-Her-Dream
+npm install
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+Create a `.env` file in the root with:
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_PUBLISHABLE_KEY=your_supabase_anon_key
+```
 
-**Use GitHub Codespaces**
+---
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Built By
 
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+Nishevitha Venkatesh - built for the **SheBuilds x International Women's Day 2026 challenge**.
