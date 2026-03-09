@@ -1,3 +1,12 @@
+# Environment variables - NEVER commit these
+.env
+.env.*
+!.env.example
+
+# Bun lock files (project uses npm, keep package-lock.json instead)
+bun.lock
+bun.lockb
+
 # Logs
 logs
 *.log

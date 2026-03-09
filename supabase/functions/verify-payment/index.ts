@@ -19,7 +19,10 @@ serve(async (req) => {
       throw new Error("Missing sessionId");
     }
 
-    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
+    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
+    if (!stripeKey) throw new Error("STRIPE_SECRET_KEY is not configured");
+
+    const stripe = new Stripe(stripeKey, {
       apiVersion: "2025-08-27.basil",
     });
 
@@ -38,11 +41,25 @@ serve(async (req) => {
       throw new Error("Missing metadata");
     }
 
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    if (!supabaseUrl || !supabaseServiceKey) throw new Error("Supabase env vars not configured");
+
     // Use service role to update the idea
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL") || "",
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || ""
-    );
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // Idempotency check: skip if this session was already processed
+    const { data: existing } = await supabase
+      .from("contributions")
+      .select("id")
+      .eq("stripe_session_id", sessionId)
+      .maybeSingle();
+
+    if (existing) {
+      return new Response(JSON.stringify({ verified: true, already_processed: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     // Record the contribution
     await supabase.from("contributions").insert({
