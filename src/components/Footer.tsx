@@ -6,7 +6,7 @@ interface FooterProps {
 
 const Footer = ({ onSubmitClick }: FooterProps) => {
   return (
-    <footer className="border-t bg-secondary/30 py-12">
+    <footer className="border-t bg-secondary/30 py-16">
       <div className="container mx-auto px-4">
         <div className="grid gap-10 md:grid-cols-[1.5fr_1fr_1.5fr]">
           <div>
@@ -42,8 +42,13 @@ const Footer = ({ onSubmitClick }: FooterProps) => {
           </div>
         </div>
 
-        <div className="mt-10 flex items-center justify-center gap-1.5 border-t pt-6 text-sm text-muted-foreground">
-          Built with <Heart className="h-3.5 w-3.5 fill-primary text-primary" /> for International Women's Day 2026 - SheBuilds by Claude, Lovable & Stripe
+        <div className="mt-10 border-t pt-6 flex flex-col items-center gap-2">
+          <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+            Built with <Heart className="h-3.5 w-3.5 fill-primary text-primary" /> for International Women's Day 2026 - SheBuilds by Claude, Lovable & Stripe
+          </div>
+          <p className="text-xs text-muted-foreground/60">
+            &copy; {new Date().getFullYear()} Nishevitha Venkatesh. All rights reserved.
+          </p>
         </div>
       </div>
     </footer>
