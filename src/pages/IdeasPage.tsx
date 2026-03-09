@@ -1,33 +1,31 @@
 import { useState } from "react";
 import Navbar from "@/components/Navbar";
-import HeroSection from "@/components/HeroSection";
-import HowItWorks from "@/components/HowItWorks";
 import IdeasGrid from "@/components/IdeasGrid";
 import SubmitIdeaForm from "@/components/SubmitIdeaForm";
 import Footer from "@/components/Footer";
 
-const Index = () => {
+const IdeasPage = () => {
   const [submitOpen, setSubmitOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
-
-  const scrollToIdeas = () => {
-    document.getElementById("ideas")?.scrollIntoView({ behavior: "smooth" });
-  };
 
   return (
     <div className="min-h-screen bg-background">
       <Navbar onSubmitClick={() => setSubmitOpen(true)} />
 
-      {/* pt-16 offsets the fixed navbar height */}
       <div className="pt-16">
-        <HeroSection
-          onSubmitClick={() => setSubmitOpen(true)}
-          onBrowseClick={scrollToIdeas}
-        />
-        <HowItWorks />
-        <IdeasGrid refreshKey={refreshKey} preview />
-        <Footer onSubmitClick={() => setSubmitOpen(true)} />
+        <div className="container mx-auto px-4 pt-12 pb-4">
+          <h1 className="text-4xl font-black tracking-tight md:text-5xl text-center">
+            All <span className="text-gradient">Ideas</span>
+          </h1>
+          <p className="mt-3 text-center text-muted-foreground">
+            Every idea here is a woman daring to build something new.
+          </p>
+        </div>
+
+        <IdeasGrid refreshKey={refreshKey} />
       </div>
+
+      <Footer onSubmitClick={() => setSubmitOpen(true)} />
 
       <SubmitIdeaForm
         open={submitOpen}
@@ -38,4 +36,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default IdeasPage;

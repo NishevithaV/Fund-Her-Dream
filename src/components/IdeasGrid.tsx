@@ -1,16 +1,23 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import IdeaCard, { type Idea } from "@/components/IdeaCard";
 import BackIdeaModal from "@/components/BackIdeaModal";
+import { Button } from "@/components/ui/button";
+import { ArrowRight } from "lucide-react";
+
+const PREVIEW_COUNT = 6;
 
 interface IdeasGridProps {
-  refreshKey: number;
+  refreshKey?: number;
+  preview?: boolean;
 }
 
-const IdeasGrid = ({ refreshKey }: IdeasGridProps) => {
+const IdeasGrid = ({ refreshKey = 0, preview = false }: IdeasGridProps) => {
   const [ideas, setIdeas] = useState<Idea[]>([]);
   const [selectedIdea, setSelectedIdea] = useState<Idea | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const navigate = useNavigate();
 
   const fetchIdeas = async () => {
     const { data } = await supabase
@@ -47,6 +54,9 @@ const IdeasGrid = ({ refreshKey }: IdeasGridProps) => {
     return () => { supabase.removeChannel(channel); };
   }, []);
 
+  const displayedIdeas = preview ? ideas.slice(0, PREVIEW_COUNT) : ideas;
+  const hasMore = preview && ideas.length > PREVIEW_COUNT;
+
   return (
     <section id="ideas" className="py-20">
       <div className="container mx-auto px-4">
@@ -57,15 +67,33 @@ const IdeasGrid = ({ refreshKey }: IdeasGridProps) => {
           Discover innovative ideas from women founders and help bring them to life.
         </p>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {ideas.map((idea) => (
-            <IdeaCard
-              key={idea.id}
-              idea={idea}
-              onBack={(idea) => { setSelectedIdea(idea); setModalOpen(true); }}
-            />
-          ))}
-        </div>
+        {displayedIdeas.length === 0 ? (
+          <p className="text-center text-muted-foreground py-12">No ideas yet — be the first to submit!</p>
+        ) : (
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {displayedIdeas.map((idea) => (
+              <IdeaCard
+                key={idea.id}
+                idea={idea}
+                onBack={(idea) => { setSelectedIdea(idea); setModalOpen(true); }}
+              />
+            ))}
+          </div>
+        )}
+
+        {(preview || hasMore) && (
+          <div className="mt-12 flex justify-center">
+            <Button
+              variant="hero-outline"
+              size="lg"
+              className="gap-2"
+              onClick={() => navigate("/ideas")}
+            >
+              View All Ideas
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
       </div>
 
       <BackIdeaModal
