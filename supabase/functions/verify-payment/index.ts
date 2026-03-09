@@ -1,16 +1,25 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
+import { checkRateLimit, getClientIp, rateLimitedResponse } from "../_shared/rateLimit.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+// 30 verification attempts per IP per hour
+const RATE_LIMIT = 30;
+const WINDOW_MS = 60 * 60 * 1000;
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
+
+  const ip = getClientIp(req);
+  const { allowed, retryAfter } = checkRateLimit(`verify:${ip}`, RATE_LIMIT, WINDOW_MS);
+  if (!allowed) return rateLimitedResponse(retryAfter!, corsHeaders);
 
   try {
     const { sessionId } = await req.json();
@@ -45,7 +54,6 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
     if (!supabaseUrl || !supabaseServiceKey) throw new Error("Supabase env vars not configured");
 
-    // Use service role to update the idea
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     // Idempotency check: skip if this session was already processed

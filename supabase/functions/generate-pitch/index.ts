@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { checkRateLimit, getClientIp, rateLimitedResponse } from "../_shared/rateLimit.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -6,8 +7,16 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+// 10 pitch generations per IP per hour
+const RATE_LIMIT = 10;
+const WINDOW_MS = 60 * 60 * 1000;
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+
+  const ip = getClientIp(req);
+  const { allowed, retryAfter } = checkRateLimit(`pitch:${ip}`, RATE_LIMIT, WINDOW_MS);
+  if (!allowed) return rateLimitedResponse(retryAfter!, corsHeaders);
 
   try {
     const { title, description } = await req.json();
