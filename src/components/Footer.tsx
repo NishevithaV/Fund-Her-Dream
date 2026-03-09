@@ -8,12 +8,12 @@ const Footer = ({ onSubmitClick }: FooterProps) => {
   return (
     <footer className="border-t bg-secondary/30 py-12">
       <div className="container mx-auto px-4">
-        <div className="grid gap-8 md:grid-cols-3">
+        <div className="grid gap-10 md:grid-cols-[1.5fr_1fr_1.5fr]">
           <div>
             <h3 className="mb-3 text-lg font-bold text-gradient">Fund Her Idea</h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
               A micro-crowdfunding platform celebrating women founders and the bold ideas shaping our future.
-              Every contribution — no matter how small — sends a powerful signal of belief.
+              Every contribution - no matter how small - sends a powerful signal of belief.
             </p>
           </div>
 
@@ -43,7 +43,7 @@ const Footer = ({ onSubmitClick }: FooterProps) => {
         </div>
 
         <div className="mt-10 flex items-center justify-center gap-1.5 border-t pt-6 text-sm text-muted-foreground">
-          Built with <Heart className="h-3.5 w-3.5 fill-primary text-primary" /> for International Women's Day 2026 — SheBuilds by Claude, Lovable & Stripe
+          Built with <Heart className="h-3.5 w-3.5 fill-primary text-primary" /> for International Women's Day 2026 - SheBuilds by Claude, Lovable & Stripe
         </div>
       </div>
     </footer>
