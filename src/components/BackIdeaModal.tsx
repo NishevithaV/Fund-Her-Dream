@@ -40,7 +40,7 @@ const BackIdeaModal = ({ idea, open, onOpenChange, onSuccess }: BackIdeaModalPro
         onOpenChange(false);
         onSuccess();
       }
-    } catch (e: any) {
+    } catch (e) {
       toast.error("Payment failed. Please try again.");
       console.error(e);
     } finally {
@@ -97,9 +97,14 @@ const BackIdeaModal = ({ idea, open, onOpenChange, onSuccess }: BackIdeaModalPro
           )}
         </div>
 
+        <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          <p className="font-semibold">Demo mode; you won't be charged.</p>
+          <p className="mt-0.5">This is a proof of concept. To test a payment, use card <span className="font-mono font-bold">4242 4242 4242 4242</span> with any future date and any CVC. Please do not enter a real card number.</p>
+        </div>
+
         <Button
           variant="hero"
-          className="mt-4 h-12 w-full text-base"
+          className="h-12 w-full text-base"
           disabled={finalAmount < 1 || loading}
           onClick={handleBack}
         >
